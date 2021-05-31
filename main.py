@@ -75,20 +75,19 @@ window.bind("<KeyPress-Escape>", Quit)
 
 window.mainloop()       # wywołanie programu
 
+# WERSJA UNIWERSALNA, Z UŻYCIEM LAMBDA (lambda jest potrzebna, by przekazać argumenty do wywoływanej funkcji)
 
+# def main(loc1_name, loc2_name, unit):
+#     geolocator = Nominatim(user_agent="distance-on-earth")  # wybór API do wyszukania miejsc - Nominatim (OpenStreetMap)
+#     loc1 = geolocator.geocode(loc1_name)  # szukanie współrzędnych 1 miejsca
+#     loc2 = geolocator.geocode(loc2_name)  # szukanie współrzędnych 2 miejsca
+#
+#     radius = 3958.8 if unit == "mi" else 6371   # promień Ziemi: 6371 km lub 3958.8 mi (Wikipedia)
+#
+#     result = haversine_formula(loc1, loc2, radius)
+#
+#     print("Odległość między {} i {} wynosi {} {}.\n".format(loc1_name, loc2_name, result, unit))
 
+# run = Button(window, text="Oblicz", width=20, command=lambda: main(loc1_entry.get(), loc2_entry.get(), radius_rb.get()))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# print("Odlegość między tymi miejscami wynosi: {} km".format(haversine_formula(location1, location2)))
+# window.bind('<Return>', lambda event: main(loc1_entry.get(), loc2_entry.get(), radius_rb.get()))
