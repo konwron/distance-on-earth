@@ -8,18 +8,20 @@ def main(*args):    # główna funkcja programu z opcjonalnymi argumentami
     geolocator = Nominatim(user_agent='distance-on-earth')  # wybór API do wyszukania miejsc - Nominatim (OpenStreetMap)
     loc1 = geolocator.geocode(loc1_entry.get())  # szukanie współrzędnych 1 miejsca
     loc2 = geolocator.geocode(loc2_entry.get())  # szukanie współrzędnych 2 miejsca
+    loc1_error_text.set('')
+    loc1_error_text.set('')
     try:
         radius = 3958.8 if (radius_rb.get()) == 'mi' else 6371      # promień Ziemi: 6371 km lub 3958.8 mi (Wikipedia)
 
         result = haversine_formula(loc1, loc2, radius)
 
-        print('Odległość między {} i {} wynosi {} {}.\n'.format(loc1_entry.get(), loc2_entry.get(), result, radius_rb.get()))
+        result_text.set('Odległość: {} {}'.format(result, radius_rb.get()))
     except AttributeError:
         print(loc1, loc2)
         if not loc1:
-            print('Podaj istniejącą lokalizację')
+            loc1_error_text.set('Podaj istniejącą lokalizację')
         if not loc2:
-            print('Podaj istniejącą lokalizację')
+            loc2_error_text.set('Podaj istniejącą lokalizację')
 
 
 # Metoda Haversine'a
@@ -39,9 +41,9 @@ def haversine_formula(loc1, loc2, radius):
     # obliczanie na podstawie wzoru (https://en.wikipedia.org/wiki/Haversine_formula)
     a = pow(sin(lat_distance / 2), 2) + cos(lat1 * deg_to_rad) * cos(lat2 * deg_to_rad) * pow(sin(lon_distance / 2), 2)
 
-    c = round(2 * atan2(sqrt(a), sqrt(1 - a)), 3)       # wynik zaokrąglony do 3 miejsc po przecinku
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-    return radius * c
+    return round(radius * c, 3)     # wynik zaokrąglony do 3 miejsc po przecinku
 
 
 def Quit(event):
@@ -60,10 +62,16 @@ loc1_description = Label(window, text='Podaj pierwszą lokalizację').pack()
 loc1_entry = Entry(window, width=40)
 loc1_entry.pack()     # miejsce do wprowadzenia nazwy pierwszego miasta
 
+loc1_error_text = StringVar('')
+loc1_error_msg = Label(window, textvariable=loc1_error_text, fg='red').pack()
+
 loc2_input = StringVar()
 loc2_description = Label(window, text='Podaj drugą lokalizację').pack()
 loc2_entry = Entry(window, width=40)
 loc2_entry.pack()     # miejsce do wprowadzenia nazwy drugiego miasta
+
+loc2_error_text = StringVar('')
+loc2_error_msg = Label(window, textvariable=loc2_error_text, fg='red').pack()
 
 radius_rb = StringVar()  # zmienna sterująca zaznaczeniem kontrolki
 rb_frame = LabelFrame(window, text='Wybierz jednostkę miary')
@@ -77,8 +85,12 @@ radius_rb.set('km')    # ustawiam początkowe zaznaczenie na kontrolkę km
 run = Button(window, text='Oblicz', width=20, command=main)
 run.pack()   # wypisana będzie wartość adekwatna do miary długości
 
+result_text = StringVar()
+result_text.set('Odległość:')
+result_msg = Label(window, textvariable=result_text, font=25).pack()
+
 window.bind('<Return>', main)
-window.bind("<KeyPress-Escape>", Quit)
+window.bind("<KeyPress-Escape>", Quit)      # obsługa wyjścia z GUI za pomocą przycisku Esc
 
 window.mainloop()       # nasłuchiwanie zdarzeń z Tkintera
 
