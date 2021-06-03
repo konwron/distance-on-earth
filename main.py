@@ -18,7 +18,7 @@ def main(*args):    # główna funkcja programu z opcjonalnymi argumentami
         result = haversine_formula(loc1, loc2, radius)
 
         result_text.set('{} {}'.format(result, radius_rb.get()))
-        print(loc1, loc2)
+        print('{}\n{}'.format(loc1, loc2))      # wypisanie nazw lokalizacji w konsoli
     except AttributeError:      # obsługa błędu, gdy nic nie zostanie wpisane przez użytkownika, lub zostanie wpisana nieistaniejąca lokalizacja
         print(loc1, loc2)
         if not loc1:
@@ -38,13 +38,14 @@ def haversine_formula(loc1, loc2, radius):
 
     deg_to_rad = float(pi / 180.0)
 
-    lat_distance = (lat2 - lat1) * deg_to_rad       # zamiana stopni na radiany
-    lon_distance = (lon2 - lon1) * deg_to_rad
+    # zamiana stopni na radiany
+    lat_distance = (lat2 - lat1) * deg_to_rad       # różnica między szerokościami geograficznymi
+    lon_distance = (lon2 - lon1) * deg_to_rad       # różnica między długościami geograficznymi
 
     # obliczanie na podstawie wzoru (https://en.wikipedia.org/wiki/Haversine_formula)
     a = pow(sin(lat_distance / 2), 2) + cos(lat1 * deg_to_rad) * cos(lat2 * deg_to_rad) * pow(sin(lon_distance / 2), 2)
 
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    c = 2 * asin(sqrt(a))
 
     return round(radius * c, 3)     # wynik zaokrąglony do 3 miejsc po przecinku
 
