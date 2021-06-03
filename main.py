@@ -9,13 +9,15 @@ def main(*args):    # główna funkcja programu z opcjonalnymi argumentami
     loc1 = geolocator.geocode(loc1_entry.get())  # szukanie współrzędnych 1 miejsca
     loc2 = geolocator.geocode(loc2_entry.get())  # szukanie współrzędnych 2 miejsca
     loc1_error_text.set('')
-    loc1_error_text.set('')
+    loc2_error_text.set('')
+    result_text.set('')
     try:
         radius = 3958.8 if (radius_rb.get()) == 'mi' else 6371      # promień Ziemi: 6371 km lub 3958.8 mi (Wikipedia)
 
         result = haversine_formula(loc1, loc2, radius)
 
-        result_text.set('Odległość: {} {}'.format(result, radius_rb.get()))
+        result_text.set('{} {}'.format(result, radius_rb.get()))
+        print(loc1, loc2)
     except AttributeError:
         print(loc1, loc2)
         if not loc1:
@@ -52,42 +54,44 @@ def Quit(event):
 
 # tworzenie GUI (interfejsu użytkownika)
 window = Tk()       # tworzenie okna głównego programu
-window.geometry('600x400')      # rozmiar okna programu
-window.columnconfigure(0, weight=1)
-window.rowconfigure(0, weight=1)
+window.configure(padx=80, pady=30)
 window.title('Oblicz odległość pomiędzy dwoma punktami na kuli ziemskiej')      # ustawienie tytułu okna
 
-loc1_input = StringVar()
-loc1_description = Label(window, text='Podaj pierwszą lokalizację').pack()
-loc1_entry = Entry(window, width=40)
-loc1_entry.pack()     # miejsce do wprowadzenia nazwy pierwszego miasta
+loc1_description = Label(window, text='Podaj pierwszą lokalizację')
+loc1_description.grid(row=0, column=0)
+loc1_entry = Entry(window)
+loc1_entry.grid(row=0, column=1, sticky=EW)     # miejsce do wprowadzenia nazwy pierwszego miasta
 
-loc1_error_text = StringVar('')
-loc1_error_msg = Label(window, textvariable=loc1_error_text, fg='red').pack()
+loc1_error_text = StringVar()
+loc1_error_msg = Label(window, textvariable=loc1_error_text, fg='red')
+loc1_error_msg.grid(row=1, column=1, pady=(0, 15))
 
-loc2_input = StringVar()
-loc2_description = Label(window, text='Podaj drugą lokalizację').pack()
-loc2_entry = Entry(window, width=40)
-loc2_entry.pack()     # miejsce do wprowadzenia nazwy drugiego miasta
+loc2_description = Label(window, text='Podaj drugą lokalizację')
+loc2_description.grid(row=2, column=0)
+loc2_entry = Entry(window)
+loc2_entry.grid(row=2, column=1, sticky=EW)     # miejsce do wprowadzenia nazwy drugiego miasta
 
-loc2_error_text = StringVar('')
-loc2_error_msg = Label(window, textvariable=loc2_error_text, fg='red').pack()
+loc2_error_text = StringVar()
+loc2_error_msg = Label(window, textvariable=loc2_error_text, fg='red')
+loc2_error_msg.grid(row=3, column=1, pady=(0, 15))
 
 radius_rb = StringVar()  # zmienna sterująca zaznaczeniem kontrolki
 rb_frame = LabelFrame(window, text='Wybierz jednostkę miary')
-rb_frame.pack()
+rb_frame.grid(row=4, column=0, rowspan=2)
 km_rb = Radiobutton(rb_frame, variable=radius_rb, value='km', indicator=0, text='kilometry')
-km_rb.pack(fill=X, ipady=5)
+km_rb.pack(fill=X, ipady=5, padx=5)
 mi_rb = Radiobutton(rb_frame, variable=radius_rb, value='mi', indicator=0, text='mile')
-mi_rb.pack(fill=X, ipady=5)
+mi_rb.pack(fill=X, ipady=5, padx=5, pady=5)
 radius_rb.set('km')    # ustawiam początkowe zaznaczenie na kontrolkę km
 
-run = Button(window, text='Oblicz', width=20, command=main)
-run.pack()   # wypisana będzie wartość adekwatna do miary długości
-
 result_text = StringVar()
-result_text.set('Odległość:')
-result_msg = Label(window, textvariable=result_text, font=25).pack()
+result_label = Label(window, text='Odległość: ', font=25)
+result_label.grid(row=6, column=0, pady=5)
+result_entry = Entry(window, textvariable=result_text, state=DISABLED, font=25, fg='black', bg='white', cursor='arrow')
+result_entry.grid(row=6, column=1, pady=5, padx=5)
+
+run = Button(window, text='Oblicz', command=main)
+run.grid(row=7, column=1, ipadx=50, ipady=10, padx=5, sticky=E)   # wypisana będzie wartość adekwatna do miary długości
 
 window.bind('<Return>', main)
 window.bind("<KeyPress-Escape>", Quit)      # obsługa wyjścia z GUI za pomocą przycisku Esc
