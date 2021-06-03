@@ -6,8 +6,9 @@ from tkinter import *                       # GUI
 def main(*args):    # główna funkcja programu z opcjonalnymi argumentami
 
     geolocator = Nominatim(user_agent='distance-on-earth')  # wybór API do wyszukania miejsc - Nominatim (OpenStreetMap)
-    loc1 = geolocator.geocode(loc1_entry.get())  # szukanie współrzędnych 1 miejsca
-    loc2 = geolocator.geocode(loc2_entry.get())  # szukanie współrzędnych 2 miejsca
+    loc1 = geolocator.geocode(loc1_entry.get())             # szukanie współrzędnych 1 miejsca
+    loc2 = geolocator.geocode(loc2_entry.get())             # szukanie współrzędnych 2 miejsca
+
     loc1_error_text.set('')
     loc2_error_text.set('')
     result_text.set('')
@@ -18,7 +19,7 @@ def main(*args):    # główna funkcja programu z opcjonalnymi argumentami
 
         result_text.set('{} {}'.format(result, radius_rb.get()))
         print(loc1, loc2)
-    except AttributeError:
+    except AttributeError:      # obsługa błędu, gdy nic nie zostanie wpisane przez użytkownika, lub zostanie wpisana nieistaniejąca lokalizacja
         print(loc1, loc2)
         if not loc1:
             loc1_error_text.set('Podaj istniejącą lokalizację')
@@ -48,69 +49,52 @@ def haversine_formula(loc1, loc2, radius):
     return round(radius * c, 3)     # wynik zaokrąglony do 3 miejsc po przecinku
 
 
-def Quit(event):
+def Quit(event):        # funkcja zamykająca program
     quit()
 
 
 # tworzenie GUI (interfejsu użytkownika)
-window = Tk()       # tworzenie okna głównego programu
-window.configure(padx=80, pady=30)
-window.title('Oblicz odległość pomiędzy dwoma punktami na kuli ziemskiej')      # ustawienie tytułu okna
+window = Tk()                                                               # tworzenie okna głównego programu
+window.configure(padx=80, pady=30)                                          # ustawienie marginesów w oknie
+window.title('Oblicz odległość pomiędzy dwoma punktami na kuli ziemskiej')  # ustawienie tytułu okna
 
 loc1_description = Label(window, text='Podaj pierwszą lokalizację')
-loc1_description.grid(row=0, column=0)
-loc1_entry = Entry(window)
-loc1_entry.grid(row=0, column=1, sticky=EW)     # miejsce do wprowadzenia nazwy pierwszego miasta
+loc1_description.grid(row=0, column=0)                              # ustawienie położenia na podstawie siatki (0,0)
+loc1_entry = Entry(window)                                          # miejsce do wprowadzenia nazwy pierwszego miejsca
+loc1_entry.grid(row=0, column=1, sticky=EW)                         # ustawienie położenia na podstawie siatki (0,1)
 
-loc1_error_text = StringVar()
-loc1_error_msg = Label(window, textvariable=loc1_error_text, fg='red')
-loc1_error_msg.grid(row=1, column=1, pady=(0, 15))
+loc1_error_text = StringVar()                                           # tekst błędu
+loc1_error_msg = Label(window, textvariable=loc1_error_text, fg='red')  # błąd wyskakujący po wprowadzeniu błędnej nazwy
+loc1_error_msg.grid(row=1, column=1, pady=(0, 15))                      # ustawienie położenia na podstawie siatki (1,1)
 
 loc2_description = Label(window, text='Podaj drugą lokalizację')
-loc2_description.grid(row=2, column=0)
-loc2_entry = Entry(window)
-loc2_entry.grid(row=2, column=1, sticky=EW)     # miejsce do wprowadzenia nazwy drugiego miasta
+loc2_description.grid(row=2, column=0)                                  # ustawienie położenia na podstawie siatki (2,0)
+loc2_entry = Entry(window)                                              # miejsce do wprowadzenia nazwy drugiego miejsca
+loc2_entry.grid(row=2, column=1, sticky=EW)                             # ustawienie położenia na podstawie siatki (2,1)
 
-loc2_error_text = StringVar()
-loc2_error_msg = Label(window, textvariable=loc2_error_text, fg='red')
-loc2_error_msg.grid(row=3, column=1, pady=(0, 15))
+loc2_error_text = StringVar()                                           # tekst błędu
+loc2_error_msg = Label(window, textvariable=loc2_error_text, fg='red')  # błąd wyskakujący po wprowadzeniu błędnej nazwy
+loc2_error_msg.grid(row=3, column=1, pady=(0, 15))                      # ustawienie położenia na podstawie siatki (3,1)
 
-radius_rb = StringVar()  # zmienna sterująca zaznaczeniem kontrolki
-rb_frame = LabelFrame(window, text='Wybierz jednostkę miary')
+radius_rb = StringVar()     # zmienna przechowująca wartość (value) zaznaczonej kontrolki
+rb_frame = LabelFrame(window, text='Wybierz jednostkę miary')       # przestrzeń z kontrolkami
 rb_frame.grid(row=4, column=0, rowspan=2)
-km_rb = Radiobutton(rb_frame, variable=radius_rb, value='km', indicator=0, text='kilometry')
+km_rb = Radiobutton(rb_frame, variable=radius_rb, value='km', indicator=0, text='kilometry')    # kontrolka - kilometry
 km_rb.pack(fill=X, ipady=5, padx=5)
-mi_rb = Radiobutton(rb_frame, variable=radius_rb, value='mi', indicator=0, text='mile')
+mi_rb = Radiobutton(rb_frame, variable=radius_rb, value='mi', indicator=0, text='mile')         # kontrolka - mile
 mi_rb.pack(fill=X, ipady=5, padx=5, pady=5)
-radius_rb.set('km')    # ustawiam początkowe zaznaczenie na kontrolkę km
+radius_rb.set('km')    # początkowe zaznaczenie na kontrolkę km
 
-result_text = StringVar()
 result_label = Label(window, text='Odległość: ', font=25)
 result_label.grid(row=6, column=0, pady=5)
-result_entry = Entry(window, textvariable=result_text, state=DISABLED, font=25, fg='black', bg='white', cursor='arrow')
+result_text = StringVar()       # zmienna przechowująca wynik (odległość)
+result_entry = Entry(window, textvariable=result_text, state=DISABLED, font=25, fg='black', cursor='arrow')
 result_entry.grid(row=6, column=1, pady=5, padx=5)
 
-run = Button(window, text='Oblicz', command=main)
-run.grid(row=7, column=1, ipadx=50, ipady=10, padx=5, sticky=E)   # wypisana będzie wartość adekwatna do miary długości
+run = Button(window, text='Oblicz', command=main)                # przycisk - wciśnięcie powoduje wywołanie funkcji main
+run.grid(row=7, column=1, ipadx=50, ipady=10, padx=5, sticky=E)  # wypisana będzie wartość adekwatna do miary długości
 
-window.bind('<Return>', main)
+window.bind('<Return>', main)               # uruchomienie programu po wciśnięciu Enter
 window.bind("<KeyPress-Escape>", Quit)      # obsługa wyjścia z GUI za pomocą przycisku Esc
 
 window.mainloop()       # nasłuchiwanie zdarzeń z Tkintera
-
-# WERSJA UNIWERSALNA, Z UŻYCIEM LAMBDA (lambda jest potrzebna, by przekazać argumenty do wywoływanej funkcji)
-
-# def main(loc1_name, loc2_name, unit):
-#     geolocator = Nominatim(user_agent="distance-on-earth")
-#     loc1 = geolocator.geocode(loc1_name)
-#     loc2 = geolocator.geocode(loc2_name)
-#
-#     radius = 3958.8 if unit == "mi" else 6371
-#
-#     result = haversine_formula(loc1, loc2, radius)
-#
-#     print("Odległość między {} i {} wynosi {} {}.\n".format(loc1_name, loc2_name, result, unit))
-
-# run = Button(window, text="Oblicz", width=20, command=lambda: main(loc1_entry.get(), loc2_entry.get(), radius_rb.get()))
-
-# window.bind('<Return>', lambda event: main(loc1_entry.get(), loc2_entry.get(), radius_rb.get()))
